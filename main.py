@@ -5,10 +5,20 @@ from mail import EmailSender  # 引用之前的 EmailSender 类
 
 app = FastAPI()
 
-@app.post("/send_lesson")
-async def send_lesson(request: EmailRequest):
-    """
-    API to send a lesson email to the user.
-    """
+class EmailRequest(BaseModel):
+    email: str
+    lesson: str
 
-    raise HTTPException(status_code=500, detail="Failed to send email")
+@app.post("/send_lesson")
+async def registe_lesson(request: EmailRequest):
+    try:
+        email = request.email
+        lesson = request.lesson
+
+        if email == "ys0430ys@sina.com":
+            return {"message": "Email sent successfully", "email": email, "lesson": lesson}
+        else:
+            raise HTTPException(status_code=400, detail="Invalid email address")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
