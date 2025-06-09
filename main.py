@@ -1,4 +1,5 @@
 from model import Ai_model
+import asyncio
 from fastapi import FastAPI, HTTPException
 from mail import EmailSender
 from pydantic import BaseModel
@@ -27,18 +28,18 @@ class EmailRequest(BaseModel):
 
 ai_model = Ai_model()
 
-def send_lesson():
+async def send_lesson():
     current_hour = datetime.datetime.now().strftime("%H")
-    need_send_sessions = db.get_need_send_lesson(current_hour)
-    need_send_tests = db.get_need_send_test(current_hour)
+    need_send_sessions = await db.get_need_send_lesson(current_hour)
+    need_send_tests = await db.get_need_send_test(current_hour)
 
     for session in need_send_sessions:
         sessionContent = ai_model.genSession()
-        email_sender.send_email(sessionContent.title)
+        email_sender.send_email(session.email, sessionContent.title, sessionContent)
 
     for test in need_send_tests:
         testContent = ai_model.genTest()
-        email_sender.send_email(testContent)  
+        email_sender.send_email(session.email,sessionContent.title, testContent)  
 
 
 schedule.every().hour.at(":00").do(send_lesson)

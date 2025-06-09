@@ -11,7 +11,6 @@ class AsyncPgDB:
         self.pool = None # asyncpg 通常使用连接池以获得更佳性能
 
     async def create_pool(self):
-        """创建数据库连接池。"""
         try:
             self.pool = await asyncpg.create_pool(
                 host=self.host,
@@ -32,21 +31,17 @@ class AsyncPgDB:
             self.pool = None
             
     async def close_pool(self):
-        """关闭数据库连接池。"""
         if self.pool:
             await self.pool.close()
             print("连接池已关闭。")
 
     async def get_lesson_count(self):
-        """获取 lesson_user 表中的数据总量。"""
         if not self.pool:
             print("错误：连接池不可用。")
             return None
             
         try:
-            # 从连接池获取一个连接
             async with self.pool.acquire() as connection:
-                # fetchval可以直接获取单个值，非常方便
                 count = await connection.fetchval("SELECT COUNT(*) FROM lesson_user")
                 print(f"用户表的数据总量: {count}")
                 return count
@@ -55,10 +50,6 @@ class AsyncPgDB:
             return None
 
     async def create_lesson(self, param):
-        """
-        在 lesson_user 表中插入一条新数据。
-        注意：asyncpg 使用 $1, $2 等作为参数占位符。
-        """
         if not self.pool:
             print("错误：连接池不可用。")
             return False
@@ -78,7 +69,6 @@ class AsyncPgDB:
                     param['finish'],
                     param['lessonTime']
                 )
-            print("数据插入成功。")
             return True
         except exceptions.UniqueViolationError as e:
             # 捕获主键或唯一约束冲突的常见错误
@@ -87,3 +77,19 @@ class AsyncPgDB:
         except Exception as e:
             print(f"插入失败: {e}")
             return False
+        
+    async def get_need_to_send_session(self, current_hour):
+        if not self.pool:
+            print("错误：连接池不可用。")
+            return False
+        sql = "SELECT email,lessonName,lessonContent,process FROM lesson_user WHERE lessonTime @> $1 and finish == false;"
+
+        param = [f'["{current_hour}"]']
+
+        async with self.pool.acquire() as connection:
+            try:
+                result = await connection.fetch(sql, param)
+                return result
+            except Exception as e:
+                print(f"查询失败: {e}")
+                return None
