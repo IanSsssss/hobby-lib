@@ -1,7 +1,7 @@
 import asyncpg
 from asyncpg import exceptions
 
-class AsyncPgDB:
+class Pg:
     def __init__(self, host, database, user, password, port):
         self.host = host
         self.database = database

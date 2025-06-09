@@ -27,17 +27,3 @@ class EmailSender:
         except Exception as e:
             print(f"Failed to send email: {str(e)}")
             return False
-
-if __name__ == "__main__":
-    sender = EmailSender(
-        smtp_server="smtp.gmail.com",
-        smtp_port=587,
-        sender_email="your_email@gmail.com",
-        sender_password="your_app_password"
-    )
-    
-    success = sender.send_email(
-        recipient_email="recipient@example.com",
-        subject="Your Daily Lesson from HobbyLib",
-        content="Welcome to your Python lesson! Today's topic: Variables and Data Types."
-    )
