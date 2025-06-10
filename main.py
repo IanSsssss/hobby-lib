@@ -50,7 +50,7 @@ class EmailRequest(BaseModel):
 
 async def send_lesson(app_instance: FastAPI):
     print(f"[{datetime.datetime.now()}] 开始执行 send_lesson 任务...")
-    current_hour = datetime.datetime.now().hour # 使用整数小时
+    current_hour = datetime.datetime.now().hour
     
     db = app_instance.state.db
     ai_model = app_instance.state.ai_model
