@@ -73,3 +73,9 @@ Hobby-Lib is an AI-driven personalized learning platform that automatically gene
    - Demonstrates course generation capabilities
    - Tests session content generation
    - Validates test question generation
+
+
+# How to start
+```
+uvicorn main:app --reload
+```
